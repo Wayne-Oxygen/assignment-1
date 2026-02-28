@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>化學元素週期表 - ScienceLearner</title>
+    <link rel="stylesheet" href="style.css?v=37">
+    <!-- 
+      效能優化: 將元素資料分離到獨立的JS檔案中。
+      這使得主HTML頁面可以更快地被解析和渲染。
+      使用 <script> 標籤而不是 fetch() 是為了確保在本地 'file://' 環境中也能正常工作，
+      因為瀏覽器會阻止 'fetch' 本地檔案的請求。
+    -->
+    <script src="elements.js"></script>
+</head>
+<body>
+    <header>
+        <h1>化學元素週期表 (完整版)</h1>
+        <nav><a href="index.html" class="back-link">返回主選單</a></nav>
+    </header>
+
+    <main>
+        <section id="periodic-table-section">
+            <div id="element-search-filter" style="padding: 10px; text-align: center;">
+                <input type="text" id="element-search-input" placeholder="搜尋元素名稱、符號或原子序..." style="max-width: 300px; display: inline-block; margin-right: 10px;">
+                <div id="element-filter-buttons" style="display: inline-block;"></div>
+            </div>
+            <div id="periodic-table-display"></div>
+            <div id="element-details-modal" class="hidden" style="display: none;"></div>
+        </section>
+    </main>
+
+    <footer>
+        <p>&copy; 2026 ScienceLearner. All rights reserved.</p>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // --- DOM Element Selection ---
+            const display = document.getElementById('periodic-table-display');
+            const modal = document.getElementById('element-details-modal');
+            const searchInput = document.getElementById('element-search-input');
+            const filterButtons = document.getElementById('element-filter-buttons');
+            const elementCategoryColors = { "鹼金屬": "#FF6F61", "鹼土金屬": "#FFC3A0", "過渡金屬": "#92A8CD", "貧金屬": "#A8DADC", "類金屬": "#C4A7E7", "非金屬": "#6B5B95", "鹵素": "#F7CAC9", "惰性氣體": "#88B04B", "鑭系元素": "#D2B48C", "錒系元素": "#F3B0C3" };
+
+            // --- Data Loading ---
+            // 'window.elementsData' 是由 'elements.js' 載入的。
+            // 這種方法確保了即使在 'file://' 環境下也能載入資料。
+            const elements = window.elementsData || [];
+
+            // --- Error Handling ---
+            if(elements.length === 0) {
+                 display.innerHTML = '<p style="color: red; text-align: center;">無法載入元素資料！請檢查 elements.js 是否存在。</p>';
+                 return;
+            }
+
+            /**
+             * 根據提供的元素資料生成並顯示週期表。
+             * @param {object[]} [filteredElements=elements] - 要顯示的元素陣列。如果未提供，則顯示所有元素。
+             */
+            const generateTable = (filteredElements = elements) => {
+                const grid = Array(10 * 18).fill(null);
+                filteredElements.forEach(el => {
+                    if (el.ypos <= 10 && el.xpos <= 18) {
+                        grid[(el.ypos - 1) * 18 + (el.xpos - 1)] = el;
+                    }
+                });
+                
+                let tableHTML = '';
+                for (let r = 1; r <= 10; r++) {
+                    if (r === 8) {
+                        tableHTML += `<div style="grid-row: 8; grid-column: 1 / span 18; height: 0.5rem;"></div>`;
+                    }
+                    for (let c = 1; c <= 18; c++) {
+                        const el = grid[(r - 1) * 18 + (c - 1)];
+                        if (el) {
+                            tableHTML += `<div class="element-tile" data-atomic-number="${el.atomic_number}" style="grid-row:${el.ypos}; grid-column:${el.xpos}; background-color:${elementCategoryColors[el.category] || '#D3D3D3'};">
+                                            <div class="atomic-number">${el.atomic_number}</div>
+                                            <div class="symbol">${el.symbol}</div>
+                                            <div class="name">${el.name}</div>
+                                          </div>`;
+                        } else {
+                            if (r < 8 || r > 8) {
+                                tableHTML += `<div style="grid-row:${r}; grid-column:${c};"></div>`;
+                            }
+                        }
+                    }
+                }
+                display.innerHTML = tableHTML;
+            };
+            
+            /**
+             * 顯示包含元素詳細資訊的彈出視窗。
+             * @param {object} element - 要顯示其詳細資訊的元素對象。
+             */
+            const showDetails = (element) => {
+                modal.innerHTML = `<div id="modal-content"><h3>${element.name} (${element.symbol})</h3><p><strong>原子序:</strong> ${element.atomic_number}</p><p><strong>原子量:</strong> ${element.mass}</p><p><strong>類別:</strong> ${element.category}</p><button id="close-modal">關閉</button></div>`;
+                modal.style.display = 'flex';
+                modal.querySelector('#close-modal').addEventListener('click', () => {
+                   modal.style.display = 'none';
+                });
+            };
+
+            // --- Event Listeners ---
+            display.addEventListener('click', e => {
+                const tile = e.target.closest('.element-tile');
+                if (tile?.dataset.atomicNumber) {
+                    const elementData = elements.find(el => el.atomic_number === parseInt(tile.dataset.atomicNumber));
+                    if (elementData) showDetails(elementData);
+                }
+            });
+
+            searchInput.addEventListener('input', e => {
+                const term = e.target.value.toLowerCase();
+                generateTable(elements.filter(el => el.name.toLowerCase().includes(term) || el.symbol.toLowerCase().includes(term) || String(el.atomic_number).includes(term)));
+            });
+
+            const categories = [...new Set(elements.map(e => e.category))];
+            filterButtons.innerHTML = '<button class="filter-btn active" data-category="all">所有</button>' + categories.map(cat => `<button class="filter-btn" data-category="${cat}">${cat}</button>`).join('');
+            
+            filterButtons.addEventListener('click', e => {
+                if (e.target.classList.contains('filter-btn')) {
+                    filterButtons.querySelector('.active').classList.remove('active');
+                    e.target.classList.add('active');
+                    const category = e.target.dataset.category;
+                    generateTable(category === 'all' ? elements : elements.filter(el => el.category === category));
+                }
+            });
+
+            // --- Initial Render ---
+            generateTable();
+        });
+    </script>
+</body>
+</html>

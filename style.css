@@ -1,0 +1,330 @@
+/*
+    ScienceLearner Style Sheet
+    Version: 3.0
+    Theme: Sciency Dark
+    Author: Gemini
+*/
+
+/* --- 1. General & Typography --- */
+body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #2c3e50; /* Dark Slate Blue */
+    color: #ecf0f1; /* Light Gray */
+    line-height: 1.6;
+}
+
+h1, h2, h3 {
+    color: #ffffff; /* White */
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+a {
+    color: #1abc9c; /* Bright Cyan */
+    text-decoration: none;
+    transition: color 0.3s;
+}
+
+a:hover {
+    color: #2ecc71; /* Brighter Green on hover */
+    text-decoration: none;
+}
+
+/* --- 2. Layout & Header/Footer --- */
+header { 
+    background-color: #233140; /* Darker Charcoal */
+    color: white; 
+    padding: 20px 0; 
+    text-align: center; 
+    border-bottom: 4px solid #1abc9c; /* Cyan Accent */
+}
+
+header h1 { 
+    color: white; 
+    margin: 0; 
+    font-size: 2.2em; 
+}
+
+.tagline { 
+    font-size: 1.1em; 
+    margin-top: 5px; 
+    margin-bottom: 0; 
+    opacity: 0.9; 
+}
+
+main { 
+    padding: 20px; 
+    max-width: 1200px; 
+    margin: 20px auto; 
+}
+
+footer { 
+    text-align: center; 
+    padding: 20px; 
+    margin-top: 40px; 
+    background-color: #233140; 
+    border-top: 1px solid #3b4c5d; 
+}
+
+.back-link { 
+    color: white; 
+    font-weight: bold; 
+    padding: 8px 15px; 
+    border: 1px solid white; 
+    border-radius: 5px; 
+}
+
+.back-link:hover { 
+    background-color: rgba(255,255,255,0.1); 
+    text-decoration: none; 
+}
+
+/* --- 3. Main Menu --- */
+#main-menu { 
+    text-align: center; 
+}
+
+.tool-menu ul { 
+    list-style: none; 
+    padding: 0; 
+    display: flex; 
+    flex-wrap: wrap; 
+    justify-content: center; 
+    gap: 20px; 
+}
+
+.tool-link { 
+    display: block; 
+    background-color: rgba(255, 255, 255, 0.05);
+    border: 1px solid #3b4c5d;
+    border-radius: 8px; 
+    padding: 20px; 
+    width: 250px; 
+    border-bottom: 4px solid #16a085;
+    transition: all 0.3s;
+}
+
+.tool-link:hover { 
+    border-color: #1abc9c; 
+    transform: translateY(-3px); 
+}
+
+.tool-link h3 { 
+    color: #ecf0f1; 
+}
+
+/* --- 4. Periodic Table --- */
+#periodic-table-display { 
+    display: grid; 
+    grid-template-columns: repeat(18, 1fr); 
+    gap: 4px; 
+    padding: 10px; 
+    background-color: rgba(0,0,0,0.2);
+    border: 1px solid #3b4c5d;
+    border-radius: 8px;
+}
+
+.element-tile { 
+    border: 1px solid #3b4c5d; 
+    aspect-ratio: 1 / 1; 
+    font-size: 0.6em; 
+    color: #ecf0f1;
+    cursor: pointer; 
+    display: flex; 
+    flex-direction: column; 
+    justify-content: center; 
+    align-items: center; 
+    padding: 1px; 
+    overflow: hidden; 
+    border-radius: 3px; 
+    transition: all 0.2s ease;
+}
+
+.element-tile:hover { 
+    z-index: 10; 
+    border: 2px solid #1abc9c; 
+    background-color: rgba(26, 188, 156, 0.1); 
+}
+
+.element-tile .atomic-number { 
+    font-size: 0.8em; 
+    align-self: flex-start; 
+    margin-left: 2px; 
+    opacity: 0.7; 
+}
+
+.element-tile .symbol { 
+    font-weight: bold; 
+    font-size: 1.2em; 
+}
+
+.element-tile .name { 
+    font-size: 0.7em; 
+    word-break: break-all; 
+    text-align: center; 
+}
+
+#element-details-modal { 
+    position: fixed; 
+    top: 0; 
+    left: 0; 
+    width: 100%; 
+    height: 100%; 
+    background-color: rgba(0,0,0,0.7); 
+    display: flex; 
+    justify-content: center; 
+    align-items: center; 
+    z-index: 1000; 
+}
+
+#modal-content { 
+    background-color: #34495e; 
+    padding: 25px; 
+    border-radius: 10px; 
+    text-align: left; 
+    max-width: 300px; 
+    border: 1px solid #1abc9c; 
+}
+
+#modal-content h3 { 
+    color: #1abc9c; 
+}
+
+#modal-content button { 
+    display: block; 
+    width: 100%; 
+    margin-top: 20px; 
+    background-color: #1abc9c; 
+    color: white; 
+    border: none; 
+    padding: 10px; 
+    border-radius: 5px; 
+    cursor: pointer; 
+}
+
+/* --- 5. Calculators --- */
+.calculator-wrapper { 
+    display: flex; 
+    flex-wrap: wrap; 
+    justify-content: center; 
+    gap: 30px; 
+}
+
+.calculator-container, .physics-formulas-container { 
+    flex: 1 1 400px; 
+    padding: 25px; 
+    background-color: #34495e; 
+    border: 1px solid #4a6572; 
+    border-radius: 10px; 
+    box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+}
+
+#calculator-display { 
+    width: 100%; 
+    height: 60px; 
+    font-size: 2.2em; 
+    text-align: right; 
+    margin-bottom: 20px; 
+    background-color: #2c3e50; 
+    border: 1px solid #233140; 
+    color: #ecf0f1; 
+    border-radius: 8px; 
+    padding: 0 15px; 
+    box-sizing: border-box;
+    box-shadow: inset 0 4px 8px rgba(0,0,0,0.4);
+}
+
+.calculator-buttons { 
+    display: grid; 
+    grid-template-columns: repeat(4, 1fr); 
+    gap: 10px; 
+}
+
+.calc-button { 
+    color: #ecf0f1; 
+    padding: 18px 0; 
+    font-size: 1.1em; 
+    border: none;
+    border-radius: 8px; 
+    cursor: pointer; 
+    background-color: #4a6572;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.2);
+    transition: all 0.2s ease;
+}
+
+.calc-button:hover {
+    background-color: #5e7a8a;
+}
+
+.calc-button:active {
+    transform: translateY(2px);
+    box-shadow: 0 2px 3px rgba(0,0,0,0.2);
+}
+
+/* Different button types for a clearer interface */
+.calc-button.function {
+    background-color: #2c3e50;
+}
+.calc-button.operator { 
+    background-color: #16a085; 
+}
+.calc-button.equals { 
+    background-color: #27ae60; 
+    color: white; 
+}
+.calc-button.clear { 
+    background-color: #c0392b; 
+    color: white; 
+}
+
+/* Physics Calculator Specifics */
+#physics-formula-select { 
+    width: 100%; 
+    padding: 10px; 
+    margin-bottom: 20px; 
+    font-size: 1em; 
+    background-color: #34495e; 
+    color: #ecf0f1; 
+    border: 1px solid #3b4c5d; 
+}
+
+.physics-formula-item { 
+    background-color: #34495e; 
+    border: 1px solid #3b4c5d; 
+    border-radius: 5px; 
+    padding: 15px; 
+}
+
+.physics-formula-item label { 
+    display: block; 
+    margin: 10px 0 5px; 
+    font-weight: bold; 
+}
+
+.physics-formula-item input[type="number"] { 
+    width: 100%; 
+    padding: 8px; 
+    border: 1px solid #3b4c5d; 
+    border-radius: 3px; 
+    box-sizing: border-box; 
+    background-color: #2c3e50; 
+    color: #ecf0f1; 
+}
+
+.physics-formula-item button { 
+    background-color: #1abc9c; 
+    margin-top: 15px; 
+    width: 100%; 
+    padding: 10px; 
+    color: white; 
+    border: none; 
+    border-radius: 4px; 
+    cursor: pointer; 
+}
+
+/* --- 6. Utility --- */
+.hidden { 
+    display: none; 
+}

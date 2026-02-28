@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>物理公式計算機 - ScienceLearner</title>
+    <link rel="stylesheet" href="style.css?v=37">
+</head>
+<body>
+    <header>
+        <h1>物理公式計算機</h1>
+        <nav><a href="index.html" class="back-link">返回主選單</a></nav>
+    </header>
+
+    <main>
+        <div class="calculator-wrapper" style="justify-content: center;">
+            <div class="physics-formulas-container" style="flex-basis: 450px;">
+                <select id="physics-formula-select">
+                    <option value="">-- 請選擇公式 --</option>
+                </select>
+                <div id="physics-formula-inputs"></div>
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        <p>&copy; 2026 ScienceLearner. All rights reserved.</p>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // --- DOM Element Selection ---
+            const physicsSelect = document.getElementById('physics-formula-select');
+            const physicsInputsContainer = document.getElementById('physics-formula-inputs');
+
+            /**
+             * An array of objects, where each object represents a physics formula.
+             * @property {string} name - The display name of the formula.
+             * @property {Function} formula - The function to calculate the result.
+             * @property {string[]} variables - An array of variable names for the formula's inputs.
+             * @property {string} unit - The unit of the result.
+             */
+            const physicsFormulas = [
+                { name: "速度 (v = d/t)", formula: (d, t) => (d / t), variables: ["距離 (d)", "時間 (t)"], unit: "m/s" },
+                { name: "力 (F = ma)", formula: (m, a) => (m * a), variables: ["質量 (m)", "加速度 (a)"], unit: "N" },
+                { name: "功 (W = Fd)", formula: (F, d) => (F * d), variables: ["力 (F)", "距離 (d)"], unit: "J" },
+                { name: "動能 (KE = 0.5mv²)", formula: (m, v) => (0.5 * m * v * v), variables: ["質量 (m)", "速度 (v)"], unit: "J" },
+                { name: "重力位能 (PE = mgh)", formula: (m, g, h) => (m * g * h), variables: ["質量 (m)", "重力加速度 (g)", "高度 (h)"], unit: "J" },
+                { name: "歐姆定律 (V = IR)", formula: (I, R) => (I * R), variables: ["電流 (I)", "電阻 (R)"], unit: "V" },
+                { name: "動量 (p = mv)", formula: (m, v) => (m * v), variables: ["質量 (m)", "速度 (v)"], unit: "kg·m/s" },
+                { name: "壓力 (P = F/A)", formula: (F, A) => (F / A), variables: ["力 (F)", "面積 (A)"], unit: "Pa" },
+                { name: "密度 (ρ = m/V)", formula: (m, V) => (m / V), variables: ["質量 (m)", "體積 (V)"], unit: "kg/m³" },
+                { name: "功率 (P = W/t)", formula: (W, t) => (W / t), variables: ["功 (W)", "時間 (t)"], unit: "W" },
+                { name: "電功率 (P = VI)", formula: (V, I) => (V * I), variables: ["電壓 (V)", "電流 (I)"], unit: "W" },
+                { name: "功-能定理 (W = ΔKE)", formula: (KEf, KEi) => (KEf - KEi), variables: ["末動能 (KEf)", "初動能 (KEi)"], unit: "J" },
+                { name: "力矩 (τ = rFsinθ)", formula: (r, F, theta) => (r * F * Math.sin(theta * Math.PI / 180)), variables: ["力臂 (r)", "力 (F)", "角度 (θ)"], unit: "N·m" },
+                { name: "向心加速度 (a = v²/r)", formula: (v, r) => (v * v / r), variables: ["速度 (v)", "半徑 (r)"], unit: "m/s²" },
+                { name: "週期 (T = 1/f)", formula: (f) => (1 / f), variables: ["頻率 (f)"], unit: "s" }
+            ];
+
+            // --- Initialization ---
+            // Populate the dropdown with formulas.
+            physicsSelect.innerHTML += physicsFormulas.map((pf, i) => `<option value="${i}">${pf.name}</option>`).join('');
+
+            /**
+             * Handles the change event for the formula selection dropdown.
+             * It dynamically generates the input fields for the selected formula.
+             * @param {Event} e - The change event object.
+             */
+            physicsSelect.addEventListener('change', e => {
+                const index = e.target.value;
+                if (index === '') {
+                    physicsInputsContainer.innerHTML = ''; 
+                    return;
+                }
+                
+                const formula = physicsFormulas[index];
+                
+                // Generate and inject the HTML for the formula's input fields.
+                physicsInputsContainer.innerHTML = `
+                    <div class="physics-formula-item">
+                        ${formula.variables.map(v => `<label>${v}:</label><input type="number" step="any" class="formula-input">`).join('')}
+                        <button id="calculate-physics-btn">計算</button>
+                        <p>結果: <span id="physics-result"></span> ${formula.unit}</p>
+                    </div>`;
+
+                // Add a listener to the new "Calculate" button.
+                physicsInputsContainer.querySelector('#calculate-physics-btn').addEventListener('click', () => {
+                    const inputs = Array.from(physicsInputsContainer.querySelectorAll('.formula-input')).map(input => parseFloat(input.value));
+                    
+                    if (inputs.some(isNaN)) {
+                        physicsInputsContainer.querySelector('#physics-result').textContent = '無效輸入';
+                    } else {
+                        const result = formula.formula(...inputs);
+                        // The result is rounded to 15 significant figures for consistency.
+                        physicsInputsContainer.querySelector('#physics-result').textContent = parseFloat(result.toPrecision(15));
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>

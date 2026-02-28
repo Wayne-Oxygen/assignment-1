@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>標準計算機 - ScienceLearner</title>
+    <link rel="stylesheet" href="style.css?v=37">
+</head>
+<body>
+    <header>
+        <h1>標準計算機</h1>
+        <nav><a href="index.html" class="back-link">返回主選單</a></nav>
+    </header>
+
+    <main>
+        <div class="calculator-wrapper" style="justify-content: center;">
+            <div class="calculator-container" style="max-width: 400px; flex-basis: 400px;">
+                <input type="text" id="calculator-display" readonly>
+                <div id="standard-buttons" class="calculator-buttons"></div>
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        <p>&copy; 2026 ScienceLearner. All rights reserved.</p>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // --- DOM Element Selection ---
+            const display = document.getElementById('calculator-display');
+            const buttonsContainer = document.getElementById('standard-buttons');
+            
+            // --- State Management ---
+            let currentInput = '';
+
+            /**
+             * Defines the calculator button layout and their order.
+             * The layout is a 4-column grid.
+             * @type {string[]}
+             */
+            const calculatorKeys = [
+                'sin', 'cos', 'tan', 'C',
+                'log', 'sqrt', '(', ')',
+                '7', '8', '9', '/',
+                '4', '5', '6', '*',
+                '1', '2', '3', '-',
+                '0', '.', '^', '+',
+                '='
+            ];
+            
+            /**
+             * Generates the HTML for the calculator buttons and injects it into the container.
+             * It assigns CSS classes and data-keys for functionality.
+             */
+            buttonsContainer.innerHTML = calculatorKeys.map(key => {
+                const classes = ['calc-button'];
+                if (!isNaN(key) || key === '.') {
+                    classes.push('number');
+                } else if (key === '=') {
+                    classes.push('equals');
+                } else if (key === 'C') {
+                    classes.push('clear');
+                } else if (['sin', 'cos', 'tan', 'log', 'sqrt', '(', ')', '^'].includes(key)) {
+                    classes.push('function');
+                } else {
+                    classes.push('operator');
+                }
+                
+                let gridColumnSpan = '';
+                if (key === '=') gridColumnSpan = 'grid-column: span 4;';
+
+                return `<button class="${classes.join(' ')}" data-key="${key}" style="${gridColumnSpan}">${key}</button>`;
+            }).join('');
+
+            /**
+             * Handles all calculator input, including button clicks and keyboard presses.
+             * @param {string} key - The key or symbol representing the input.
+             */
+            const handleInput = (key) => {
+                 if (key === 'C' || key.toLowerCase() === 'c') {
+                    currentInput = '';
+                    display.value = '0';
+                } else if (key === '=' || key === 'Enter') {
+                    try {
+                        // For security and functionality, user input is sanitized before evaluation.
+                        // 1. Replace user-friendly '^' with JavaScript's '**' for exponentiation.
+                        // 2. Prepend 'Math.' to whitelisted functions to call them correctly.
+                        let expression = currentInput
+                            .replace(/\^/g, '**')
+                            .replace(/sqrt\(/g, 'Math.sqrt(')
+                            .replace(/log\(/g, 'Math.log10(');
+                        
+                        // 3. For trig functions, convert the inner value from degrees to radians.
+                        expression = expression.replace(/sin\(([^)]+)\)/g, 'Math.sin(($1) * Math.PI / 180)');
+                        expression = expression.replace(/cos\(([^)]+)\)/g, 'Math.cos(($1) * Math.PI / 180)');
+                        expression = expression.replace(/tan\(([^)]+)\)/g, 'Math.tan(($1) * Math.PI / 180)');
+                        
+                        // Use the Function constructor as a safer alternative to eval().
+                        const result = new Function('return ' + expression)();
+                        display.value = parseFloat(result.toPrecision(15));
+                        currentInput = String(result);
+                    } catch (err) {
+                        display.value = 'Error';
+                        currentInput = '';
+                    }
+                } else if (['sin', 'cos', 'tan', 'sqrt', 'log'].includes(key)) {
+                     if (display.value === '0') currentInput = '';
+                     currentInput += key + '(';
+                     display.value = currentInput;
+                } else if (key === 'Backspace') {
+                    currentInput = currentInput.slice(0, -1);
+                    display.value = currentInput || '0';
+                }
+                else {
+                    if (display.value === '0' && key !== '.') currentInput = '';
+                    currentInput += key;
+                    display.value = currentInput;
+                }
+            };
+            
+            // --- Event Listeners ---
+            buttonsContainer.addEventListener('click', e => {
+                if (e.target.matches('.calc-button')) {
+                    handleInput(e.target.dataset.key);
+                }
+            });
+
+            document.addEventListener('keydown', e => {
+                const key = e.key;
+                const validKeys = [...calculatorKeys, 'Enter', 'Backspace', 'c', 'C', '*', '/', '+', '-', '.'];
+                if ((key >= '0' && key <= '9') || validKeys.includes(key)) {
+                    e.preventDefault(); 
+                    handleInput(key);
+                }
+            });
+
+            // Initialize display
+            display.value = '0';
+        });
+    </script>
+</body>
+</html>
